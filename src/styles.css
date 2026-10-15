@@ -1,0 +1,103 @@
+/* ===== Global dizayn tokenlari (ranglar, o'lchamlar) ===== */
+:root {
+  --bg: #0a0f1f;
+  --panel: #111a33;
+  --panel-2: #0d1529;
+  --cell-bg: #17213f;
+  --border: #25325a;
+  --text: #e7ebf7;
+  --muted: #8d99bd;
+  --accent: #7c93ff;
+  --accent2: #22d3ee;
+
+  --red: #f87171;
+  --red-bg: rgba(248, 113, 113, 0.16);
+  --red-text: #fecaca;
+  --green: #34d399;
+  --green-bg: rgba(52, 211, 153, 0.16);
+  --green-text: #bbf7d0;
+  --key: #c084fc;
+  --key-bg: rgba(192, 132, 252, 0.16);
+  --key-text: #ead5ff;
+
+  /* ShiftRows uchun ustun ranglari */
+  --c0: #60a5fa;
+  --c0-bg: rgba(96, 165, 250, 0.2);
+  --c1: #f472b6;
+  --c1-bg: rgba(244, 114, 182, 0.2);
+  --c2: #fbbf24;
+  --c2-bg: rgba(251, 191, 36, 0.2);
+  --c3: #2dd4bf;
+  --c3-bg: rgba(45, 212, 191, 0.2);
+
+  /* Operatsiya ranglari */
+  --op-Input: #94a3b8;
+  --op-SubBytes: #f59e0b;
+  --op-ShiftRows: #38bdf8;
+  --op-MixColumns: #a78bfa;
+  --op-AddRoundKey: #34d399;
+
+  --cell: 48px;
+  --gap: 6px;
+  --mono: 'JetBrains Mono', 'Cascadia Code', Consolas, 'Courier New', monospace;
+  --sans: 'Inter', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+
+  color-scheme: dark;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --cell: 36px;
+    --gap: 4px;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(124, 147, 255, 0.18), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(34, 211, 238, 0.12), transparent 60%),
+    var(--bg);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+code,
+kbd {
+  font-family: var(--mono);
+}
+
+button {
+  font-family: inherit;
+}
+
+/* Legend kvadratchalari (bir nechta joyda ishlatiladi) */
+.lg {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  vertical-align: -2px;
+  margin: 0 4px 0 8px;
+  border: 1px solid;
+}
+.lg.bad { background: var(--red-bg); border-color: var(--red); }
+.lg.good { background: var(--green-bg); border-color: var(--green); }
+.lg.key { background: var(--key-bg); border-color: var(--key); }
+.lg.col-0, .seq-cell.col-0 { background: var(--c0-bg); border-color: var(--c0); }
+.lg.col-1, .seq-cell.col-1 { background: var(--c1-bg); border-color: var(--c1); }
+.lg.col-2, .seq-cell.col-2 { background: var(--c2-bg); border-color: var(--c2); }
+.lg.col-3, .seq-cell.col-3 { background: var(--c3-bg); border-color: var(--c3); }
