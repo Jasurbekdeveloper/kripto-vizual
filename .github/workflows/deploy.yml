@@ -27,7 +27,7 @@ jobs:
       - run: npx ng build --base-href "/${{ github.event.repository.name }}/"
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/aes-visualizer/browser
+          path: dist/kripto-vizual/browser
 
   deploy:
     needs: build

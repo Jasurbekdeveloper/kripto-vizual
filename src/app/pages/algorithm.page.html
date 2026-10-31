@@ -1,0 +1,108 @@
+@if (algo(); as a) {
+  <header class="page-head">
+    <div class="crumbs"><a routerLink="/">Bosh sahifa</a> / <span>{{ a.topic }}-mavzu: {{ topic()?.title }}</span></div>
+    <h1>{{ a.name }}</h1>
+    <p class="lead">{{ a.short }}</p>
+    @if (siblings().length > 1) {
+      <nav class="tabs">
+        @for (s of siblings(); track s.id) { <a [routerLink]="['/algo', s.id]" [class.active]="s.id === a.id">{{ s.name }}</a> }
+      </nav>
+    }
+  </header>
+
+  <div class="layout">
+    <aside class="side">
+      <section class="card">
+        <h3>Kirish ma’lumotlari</h3>
+        <form (ngSubmit)="run()">
+          @for (f of a.fields; track f.key) {
+            <label class="field">
+              <span>{{ f.label }}</span>
+              @switch (f.type) {
+                @case ('select') {
+                  <select [name]="f.key" [(ngModel)]="values[f.key]" (ngModelChange)="run()">
+                    @for (o of f.options; track o.value) { <option [value]="o.value">{{ o.label }}</option> }
+                  </select>
+                }
+                @case ('textarea') { <textarea [name]="f.key" [(ngModel)]="values[f.key]" rows="3"></textarea> }
+                @default { <input [name]="f.key" [type]="f.type === 'number' ? 'text' : 'text'" [attr.inputmode]="f.type === 'number' ? 'numeric' : null" [(ngModel)]="values[f.key]" spellcheck="false" /> }
+              }
+              @if (f.hint) { <small>{{ f.hint }}</small> }
+            </label>
+          }
+          <button class="btn primary" type="submit">▶ Hisoblash</button>
+        </form>
+        @if (a.examples?.length) {
+          <div class="examples">
+            <span>Namunalar:</span>
+            @for (ex of a.examples; track ex.label) { <button class="chip" (click)="example(ex.values)">{{ ex.label }}</button> }
+          </div>
+        }
+      </section>
+
+      @if (error()) { <div class="note warn">{{ error() }}</div> }
+
+      @if (result(); as r) {
+        <section class="card out">
+          <h3>Natija</h3>
+          @for (o of r.output; track o.label) { <div class="out-row"><span>{{ o.label }}</span><code>{{ o.value }}</code></div> }
+        </section>
+      }
+
+      <section class="card theory">
+        <h3>Nazariya</h3>
+        @for (t of a.theory; track $index) { <p>{{ t }}</p> }
+        @if (a.formulas?.length) {
+          <div class="formulas">@for (f of a.formulas; track $index) { <code>{{ f }}</code> }</div>
+        }
+      </section>
+    </aside>
+
+    <main class="stage">
+      @if (result(); as r) {
+        <div class="player card">
+          <div class="controls">
+            <button class="btn" (click)="go(0)" title="Boshiga">⏮</button>
+            <button class="btn" (click)="prev()" title="Oldingi (←)">◀</button>
+            <button class="btn primary" (click)="toggle()" title="Avto (bo‘sh joy)">{{ playing() ? '⏸ Pauza' : '▶ Avto' }}</button>
+            <button class="btn" (click)="next()" title="Keyingi (→)">▶</button>
+            <button class="btn" (click)="go(total() - 1)" title="Oxiriga">⏭</button>
+            <span class="counter">{{ idx() + 1 }} / {{ total() }}</span>
+            <select class="speed" [ngModel]="speed()" (ngModelChange)="setSpeed(+$event)">
+              <option [ngValue]="3000">Sekin</option><option [ngValue]="1800">O‘rtacha</option><option [ngValue]="800">Tez</option>
+            </select>
+            <label class="all"><input type="checkbox" [ngModel]="showAll()" (ngModelChange)="showAll.set($event)" /> Barcha qadamlar</label>
+          </div>
+          <div class="bar"><div [style.width.%]="progress()"></div></div>
+          <ol class="timeline">
+            @for (s of r.steps; track $index; let i = $index) {
+              <li [class.done]="i < idx()" [class.cur]="i === idx()" (click)="go(i)" [title]="s.title"><span>{{ i + 1 }}</span></li>
+            }
+          </ol>
+        </div>
+
+        @if (showAll()) {
+          @for (s of r.steps; track $index; let i = $index) {
+            <article class="step card" [class.cur]="i === idx()" (click)="go(i)">
+              <h2><span class="num">{{ i + 1 }}</span>{{ s.title }}</h2>
+              @if (s.text) { <p class="step-text">{{ s.text }}</p> }
+              @for (v of s.visuals; track $index) { <kv-visual [visual]="v" /> }
+            </article>
+          }
+        } @else if (step(); as s) {
+          @let i = idx();
+          <article class="step card anim" [attr.data-k]="i">
+            <h2><span class="num">{{ i + 1 }}</span>{{ s.title }}</h2>
+            @if (s.text) { <p class="step-text">{{ s.text }}</p> }
+            @for (v of s.visuals; track $index) { <kv-visual [visual]="v" /> }
+          </article>
+          <p class="hint">Klaviatura: ← → — qadamlar, bo‘sh joy — avto rejim</p>
+        }
+      } @else if (!error()) {
+        <div class="card empty">Kirish ma’lumotlarini kiriting va “Hisoblash” tugmasini bosing.</div>
+      }
+    </main>
+  </div>
+} @else {
+  <div class="card empty">Algoritm topilmadi. <a routerLink="/">Bosh sahifaga</a></div>
+}
