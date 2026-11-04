@@ -76,4 +76,4 @@ Klaviatura: ← → — qadamlar, bo‘sh joy — avto rejim. O‘ng yuqorida yo
 
 ## GitHub Pages
 
-`main` branchiga push qilinganda `.github/workflows/deploy.yml` ilovani GitHub Pages'ga avtomatik build va deploy qiladi. Sayt `https://jasurbekdeveloper.github.io/aes-visualizer/` manzilida ochiladi.
+`main` branchiga push qilinganda `.github/workflows/deploy.yml` ilovani GitHub Pages'ga avtomatik build va deploy qiladi. Sayt `https://jasurbekdeveloper.github.io/kripto-vizual/` manzilida ochiladi.

@@ -4,7 +4,7 @@ import { extEuclidSteps, fastPowSteps } from './t1-modular';
 
 /* ---------------------------------------------------------------
  * 3-, 7-, 8-, 11-MAVZULAR: Ochiq kalitli kriptografiya
- * RSA, ElGamal, ERI (RSA / ElGamal / DSA), Diffie–Hellman
+ * RSA, ElGamal, ERI (RSA / ElGamal), Diffie–Hellman
  * ------------------------------------------------------------- */
 
 const prefixed = (pre: string, steps: Step[]): Step[] => steps.map((s) => ({ ...s, title: `${pre}: ${s.title}` }));
@@ -179,46 +179,6 @@ export const elgamalSign: AlgorithmDef = {
   },
 };
 
-/* ---------- DSA ---------- */
-export const dsa: AlgorithmDef = {
-  id: 'dsa', topic: 8, name: 'DSA imzo algoritmi',
-  short: 'r = (gᵏ mod p) mod q, s = k⁻¹(h + x·r) mod q',
-  theory: ['Parametrlar: p — tub, q — (p−1) ning tub bo‘luvchisi, g — tartibi q bo‘lgan element (g = h^((p−1)/q) mod p).', 'Tekshirish: w = s⁻¹, u₁ = h·w, u₂ = r·w (mod q), v = (g^u₁·y^u₂ mod p) mod q; v = r bo‘lsa imzo to‘g‘ri.'],
-  formulas: ['y = gˣ mod p', 'r = (gᵏ mod p) mod q', 's = k⁻¹(h + x·r) mod q', 'v = (g^u₁ · y^u₂ mod p) mod q'],
-  fields: [
-    { key: 'p', label: 'p', type: 'number', default: '23' }, { key: 'q', label: 'q', type: 'number', default: '11' },
-    { key: 'g', label: 'g', type: 'number', default: '4' }, { key: 'x', label: 'x (maxfiy, x < q)', type: 'number', default: '3' },
-    { key: 'h', label: 'H(M)', type: 'number', default: '5' }, { key: 'k', label: 'k (k < q)', type: 'number', default: '7' },
-  ],
-  run(v) {
-    const p = big(v, 'p'), q = big(v, 'q'), g = big(v, 'g'), x = big(v, 'x'), h = big(v, 'h'), k = big(v, 'k');
-    const steps: Step[] = [requirePrime(p, 'p'), requirePrime(q, 'q')];
-    if ((p - 1n) % q !== 0n) throw new Error('q (p−1) ni bo‘lishi kerak');
-    if (modPow(g, q, p) !== 1n || g <= 1n) throw new Error(`g^q mod p = ${modPow(g, q, p)} ≠ 1 — g tartibi q emas`);
-    steps.push({ title: 'Parametrlarni tekshirish', visuals: [{ kind: 'formula', text: `(p−1)/q = ${(p - 1n) / q},   g^q mod p = ${g}^${q} mod ${p} = 1 ✓` }] });
-    const y = modPow(g, x, p);
-    steps.push({ title: 'Ochiq kalit', visuals: [{ kind: 'formula', text: `y = gˣ mod p = ${g}^${x} mod ${p} = ${y}` }] });
-    const gk = modPow(g, k, p), r = gk % q;
-    const ki = modInv(k, q);
-    const s = mod(ki * (h + x * r), q);
-    steps.push({ title: 'Imzo yaratish', visuals: [
-      { kind: 'formula', text: `r = (gᵏ mod p) mod q = (${g}^${k} mod ${p}) mod ${q} = ${gk} mod ${q} = ${r}` },
-      { kind: 'formula', text: `k⁻¹ mod q = ${k}⁻¹ mod ${q} = ${ki}` },
-      { kind: 'formula', text: `s = k⁻¹(h + x·r) mod q = ${ki}·(${h} + ${x}·${r}) mod ${q} = ${ki}·${h + x * r} mod ${q} = ${s}` },
-      { kind: 'note', tone: 'ok', text: `Imzo (r, s) = (${r}, ${s})` },
-    ] });
-    if (r === 0n || s === 0n) throw new Error('r yoki s = 0 — boshqa k tanlang');
-    const w = modInv(s, q), u1 = mod(h * w, q), u2 = mod(r * w, q);
-    const vv = mod(modPow(g, u1, p) * modPow(y, u2, p), p) % q;
-    steps.push({ title: 'Imzoni tekshirish', visuals: [
-      { kind: 'kv', items: [{ label: 'w = s⁻¹ mod q', value: `${w}` }, { label: 'u₁ = h·w mod q', value: `${u1}` }, { label: 'u₂ = r·w mod q', value: `${u2}` }] },
-      { kind: 'formula', text: `v = (g^u₁·y^u₂ mod p) mod q = (${g}^${u1}·${y}^${u2} mod ${p}) mod ${q} = ${vv}` },
-      vv === r ? { kind: 'note', tone: 'ok', text: `v = r = ${r} — imzo HAQIQIY ✓` } : { kind: 'note', tone: 'warn', text: 'v ≠ r — imzo noto‘g‘ri' },
-    ] });
-    return { steps, output: [{ label: 'y', value: `${y}` }, { label: '(r, s)', value: `(${r}, ${s})` }, { label: 'v', value: `${vv}` }] };
-  },
-};
-
 /* ---------- Diffie–Hellman ---------- */
 export const dh: AlgorithmDef = {
   id: 'dh', topic: 11, name: 'Diffie–Hellman kalit almashinuvi',
@@ -242,4 +202,4 @@ export const dh: AlgorithmDef = {
   },
 };
 
-export const TPUB = [rsa, elgamal, rsaSign, elgamalSign, dsa, dh];
+export const TPUB = [rsa, elgamal, rsaSign, elgamalSign, dh];

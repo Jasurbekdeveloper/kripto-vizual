@@ -1,5 +1,5 @@
 {
   "framework": "angular",
   "buildCommand": "npm run build",
-  "outputDirectory": "dist/aes-visualizer/browser"
+  "outputDirectory": "dist/kripto-vizual/browser"
 }

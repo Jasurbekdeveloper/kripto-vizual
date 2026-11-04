@@ -1,5 +1,5 @@
 import { ALGORITHMS, byId } from '../src/app/algorithms/registry';
-import { createHash } from 'crypto';
+import { createHash, generateKeyPairSync, verify } from 'crypto';
 const run = (id: string, v: Record<string, string>) => { const a = byId(id)!; const vals: Record<string,string> = {}; a.fields.forEach(f => vals[f.key] = f.default); Object.assign(vals, v); return a.run(vals); };
 const out = (id: string, v: Record<string,string>, label?: string) => { const r = run(id, v); return (label ? r.output.find(o=>o.label===label) : r.output[r.output.length-1])!.value; };
 const check = (name: string, got: string, exp: string) => console.log((got===exp?'OK  ':'FAIL')+' '+name+'  got='+got+(got===exp?'':'  exp='+exp));
@@ -47,7 +47,6 @@ check('Hill', out('hill',{}), 'TC'); check('Hill dec', out('hill',{mode:'dec',te
 check('XOR', out('xor',{}), '65');
 check('ECC add', out('ecc',{op:'add'}), '(10, 6)'); check('ECC dbl', out('ecc',{op:'dbl'}), '(6, 3)'); check('ECC 9P', out('ecc',{op:'mul',n:'9'}), '(7, 6)');
 console.log('ecdh', run('ecdh',{}).output.map(o=>o.label+'='+o.value).join(' '));
-console.log('dsa', run('dsa',{}).output.map(o=>o.label+'='+o.value).join(' '));
 console.log('rsa-sign', run('rsa-sign',{}).output.map(o=>o.label+'='+o.value).join(' '));
 console.log('elg-sign', run('elgamal-sign',{}).output.map(o=>o.label+'='+o.value).join(' '));
 console.log('sbox', out('aes-sbox',{}));
@@ -63,3 +62,35 @@ check('Streebog-512', out('streebog',{}), '1b54d01a4af5b9d5cc3d86d68d285462b19ab
 check('Streebog-256', out('streebog',{bits:'256'}), '9d151eefd8590b89daa6ba6cb74af9275dd051026bb149a452fd84e5e57b5500');
 check('GOST 34.10-94', out('gost-3410-94',{},'u'), '8');
 check('GOST 34.10-2012', out('gost-3410-2012',{},'Tekshiruv'), 'to‘g‘ri');
+
+// ---- DSA ----
+check('DSA darslik', out('dsa',{m:'',h:'5'},'(r, s)'), '(8, 1)');
+check('DSA 283', out('dsa',{p:'283',q:'47',g:'60',x:'24',k:'15',m:'',h:'41'},'(r, s)'), '(19, 30)');
+check('DSA 7879', out('dsa',{p:'7879',q:'101',g:'170',x:'75',k:'50',m:'',h:'22'},'(r, s)'), '(94, 97)');
+check('DSA default', out('dsa',{},'Tekshiruv'), 'to‘g‘ri');
+// Haqiqiy 2048/256 bitli kalit: bizning imzoni OpenSSL tekshiradi
+{
+  const { privateKey, publicKey } = generateKeyPairSync('dsa', { modulusLength: 2048, divisorLength: 256 });
+  const der = (b: Buffer, at: number): { body: Buffer; end: number } => {
+    let len = b[at + 1], off = at + 2;
+    if (len & 0x80) { const n = len & 0x7f; len = 0; for (let i = 0; i < n; i++) len = len * 256 + b[off++]; }
+    return { body: b.subarray(off, off + len), end: off + len };
+  };
+  const ints = (b: Buffer): bigint[] => { const o: bigint[] = []; let i = 0; while (i < b.length) { const e = der(b, i); o.push(BigInt('0x' + e.body.toString('hex'))); i = e.end; } return o; };
+  const pk = der(privateKey.export({ type: 'pkcs8', format: 'der' }) as Buffer, 0).body;
+  const ver = der(pk, 0), algo = der(pk, ver.end), oct = der(pk, algo.end);
+  const [P, Q, G] = ints(der(algo.body, der(algo.body, 0).end).body);
+  const X = ints(oct.body)[0];
+  const msg = 'Kriptografiya';
+  const K = (X * 7n + 12345n) % (Q - 1n) + 1n;
+  const res = run('dsa', { p: String(P), q: String(Q), g: String(G), x: String(X), k: String(K), m: msg, h: '' });
+  const [R, S] = res.output.find((o) => o.label === '(r, s)')!.value.replace(/[()\s]/g, '').split(',').map(BigInt);
+  const enc = (n: bigint): Buffer => { let h = n.toString(16); if (h.length % 2) h = '0' + h; if (parseInt(h[0], 16) >= 8) h = '00' + h; const v = Buffer.from(h, 'hex'); return Buffer.concat([Buffer.from([2, v.length]), v]); };
+  const body = Buffer.concat([enc(R), enc(S)]);
+  const sig = Buffer.concat([Buffer.from([0x30, body.length]), body]);
+  check('DSA 2048 ichki', res.output.find((o) => o.label === 'Tekshiruv')!.value, 'to‘g‘ri');
+  check('DSA 2048 OpenSSL', String(verify('sha256', Buffer.from(msg), publicKey, sig)), 'true');
+  check('DSA 2048 OpenSSL soxta', String(verify('sha256', Buffer.from(msg + '!'), publicKey, sig)), 'false');
+  console.log('dsa 2048 qadamlar', res.steps.length);
+}
+console.log('dsa qadamlar', run('dsa', {}).steps.length, run('dsa', {}).output.map((o) => o.label + '=' + o.value).join(' '));
