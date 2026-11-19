@@ -229,7 +229,7 @@ export function divisors(n: number): number[] {
 
 /* ======================= kirish va umumiy qadamlar ======================= */
 
-const curveFields = [
+export const curveFields = [
   { key: 'a', label: 'a', type: 'number' as const, default: '2', hint: 'istalgan butun son (mod p ga keltiriladi)' },
   { key: 'b', label: 'b', type: 'number' as const, default: '2' },
   { key: 'p', label: 'p (tub son)', type: 'number' as const, default: '17', hint: `3 ≤ p ≤ ${P_MAX.toLocaleString()}` },
@@ -270,7 +270,7 @@ function rootsOf(c: Curve, x: number): number[] {
 }
 
 /** 1–3 talablar: parametrlar tekshiruvi qadami */
-function paramsStep(c: Curve): Step {
+export function paramsStep(c: Curve): Step {
   const pc = checkPrime(c.p), sc = checkNonSingular(c.a, c.b, c.p);
   return {
     title: 'Parametrlarni tekshirish',
@@ -284,7 +284,7 @@ function paramsStep(c: Curve): Step {
 }
 
 /** Egri chiziq tartibi va Xasse chegarasi */
-function orderStep(c: Curve, hl: Pt[] = []): Step {
+export function orderStep(c: Curve, hl: Pt[] = []): Step {
   const N = c.curveOrder(), p = c.p, s = 2 * Math.sqrt(p);
   const visuals: Visual[] = [
     { kind: 'formula', text: `#E = 1 (O nuqta) + Σₓ [y² ≡ x³ + ax + b yechimlari soni] = ${N}` },
@@ -305,7 +305,7 @@ function factor(n: number): string {
 }
 
 /** Davr (nuqta tartibi) qadami: P, 2P, … , kP = O */
-function periodStep(c: Curve, P: Pt, name = 'P'): Step {
+export function periodStep(c: Curve, P: Pt, name = 'P'): Step {
   const N = c.curveOrder(), ord = c.pointOrder(P);
   const visuals: Visual[] = [
     { kind: 'formula', text: `Lagranj teoremasi: ord(${name}) | #E = ${N}. Bo‘luvchilar: ${divisors(N).join(', ')}` },

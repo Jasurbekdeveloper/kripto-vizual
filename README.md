@@ -26,7 +26,7 @@ npm run test:vectors   # barcha algoritmlarni rasmiy test vektorlari bilan teksh
 | 5. AES | AES-128/192/256 shifrlash/deshifrlash, GF(2⁸) va xtime, MixColumns ustun, S-box |
 | 6. Xesh | GOST R 34.11-94, Streebog (GOST R 34.11-2012, 256/512), SHA-256 qadamma-qadam, SHA-1/256/512 taqqoslash, Avalanche + Hamming, oddiy xesh |
 | 7–8. ERI | RSA imzo, ElGamal imzo, DSA, GOST R 34.10-94, GOST R 34.10-2012 |
-| 9–10. ECC | Nuqtalarni qo‘shish, 2P, n·P (Double-and-Add), ECDH |
+| 9–10. ECC | Nuqtalarni qo‘shish, 2P, n·P (Double-and-Add), ECDH, **ECDSA**, **GOST R 34.10-2018** (Streebog xesh bilan), **EC ElGamal** shifrlash, **nuqta ↔ belgi akslantirish jadvali** |
 | 11. Diffie–Hellman | DH kalit almashish |
 
 Tekshirilgan test vektorlari: FIPS-197 (AES), GOST R 34.12-2015 (Kuznechik, Magma), GOST R 34.11-94 va 34.11-2012 (RFC 5831, RFC 6986), FIPS 180-4 (SHA), klassik DES vektori.

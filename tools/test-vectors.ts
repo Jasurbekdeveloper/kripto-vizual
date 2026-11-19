@@ -45,7 +45,13 @@ check('Columnar nokey', out('columnar',{text:'KRIPTOGRAFIYA',key:'',cols:'4'}), 
 const ce = out('columnar',{}); check('Columnar roundtrip', out('columnar',{mode:'dec',text:ce}), 'INFORMATIONSECURITYX');
 check('Hill', out('hill',{}), 'TC'); check('Hill dec', out('hill',{mode:'dec',text:'TC'}), 'HI');
 check('XOR', out('xor',{}), '65');
-check('ECC add', out('ecc',{op:'add'}), '(10, 6)'); check('ECC dbl', out('ecc',{op:'dbl'}), '(6, 3)'); check('ECC 9P', out('ecc',{op:'mul',n:'9'}), '(7, 6)');
+check('ECC add', out('ecc',{op:'add'},'P + Q'), '(10, 6)'); check('ECC dbl', out('ecc',{op:'dbl'},'2P'), '(6, 3)'); check('ECC 9P', out('ecc',{op:'mul',n:'9'},'9·P'), '(7, 6)');
+// 8-topshiriq: ECDSA, GOST 34.10-2018, EC ElGamal (Python mustaqil hisobi bilan solishtirilgan)
+check('ECDSA Q', out('ecdsa',{},'Ochiq kalit Q'), '(21, 4)'); check('ECDSA e', out('ecdsa',{},'e'), '15'); check('ECDSA (r,s)', out('ecdsa',{},'(r, s)'), '(26, 32)'); check('ECDSA verify', out('ecdsa',{},'Tekshiruv'), 'to‘g‘ri');
+check('GOST2018 e', out('gost-3410-2018',{},'e'), '37'); check('GOST2018 p17', out('gost-3410-2018',{a:'2',b:'2',p:'17',G:'(5, 1)',h:'26'},'(r, s)'), '(7, 5)'); check('GOST2018 verify', out('gost-3410-2018',{},'Tekshiruv'), 'to‘g‘ri');
+check('GOST2012 old = 2018', out('gost-3410-2012',{},'(r, s)'), out('gost-3410-2018',{a:'2',b:'2',p:'17',G:'(5, 1)',h:'26'},'(r, s)'));
+check('EC ElGamal P_B', out('ec-elgamal',{},'P_B'), '(9, 20)'); check('EC ElGamal C', out('ec-elgamal',{},'Shifrmatn (C₁, C₂)'), '{(15, 18), (22, 28)} {(28, 2), (14, 8)} {(21, 4), (21, 27)} {(4, 28), (26, 11)} {(12, 10), (1, 25)}');
+check('EC ElGamal dec', out('ec-elgamal',{},'Deshifrlangan matn'), 'SALOM'); check('ecc-map', out('ecc-map',{},'Tiklangan matn'), 'SALOM');
 console.log('ecdh', run('ecdh',{}).output.map(o=>o.label+'='+o.value).join(' '));
 console.log('rsa-sign', run('rsa-sign',{}).output.map(o=>o.label+'='+o.value).join(' '));
 console.log('elg-sign', run('elgamal-sign',{}).output.map(o=>o.label+'='+o.value).join(' '));

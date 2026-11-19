@@ -8,6 +8,7 @@ import { T4DES } from './t4-des';
 import { T5 } from './t5-aes';
 import { T6 } from './t6-sha';
 import { T9 } from './t9-ecc';
+import { T9CRYPTO } from './t9-ecc-crypto';
 import { TGOST } from './t-gost';
 
 /**
@@ -35,7 +36,7 @@ export const TOPICS: Topic[] = [
  *   1) algorithms/ papkasida AlgorithmDef obyektini yozing (run() qadamlar ro'yxatini qaytaradi)
  *   2) shu massivga qo'shing — menyu, sahifa va vizualizatsiya avtomatik paydo bo'ladi.
  */
-export const ALGORITHMS: AlgorithmDef[] = [...T1, ...T2, ...TPUB, ...TDSA, ...T4, ...T4DES, ...T5, ...T6, ...T9, ...TGOST];
+export const ALGORITHMS: AlgorithmDef[] = [...T1, ...T2, ...TPUB, ...TDSA, ...T4, ...T4DES, ...T5, ...T6, ...T9, ...T9CRYPTO, ...TGOST];
 
 export const byId = (id: string): AlgorithmDef | undefined => ALGORITHMS.find((a) => a.id === id);
 export const byTopic = (n: number): AlgorithmDef[] => ALGORITHMS.filter((a) => a.topic === n);
